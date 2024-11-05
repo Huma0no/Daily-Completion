@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="es"></html>
+<head>
+    <meta charset="UTF-8">
+    <title>Service Call Report</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Service Call Report">
+    <link rel="apple-touch-icon" href="path/to/your/icon.png">
+    <link rel="manifest" href="manifest.json">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            background: linear-gradient(to right, #f8f9fa, #e9ecef); /* soft gradient background */
+            color: #333;
+        }
+        .container {
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.8); /* Fondo blanco semitransparente para el contenido */
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra suave */
+            max-width: 800px;
+            margin: 40px auto; /* Centrar el contenedor */
+        }
+        h1, h2, h3 {
+            text-align: center;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .button-group {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            margin-top: 10px;
+        }
+        .button-group label {
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .button-group .button-row {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+        }
+        .button-group button {
+            width: 22%;
+            padding: 10px;
+            background-color: #ccc;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px 0;
+        }
+        .button-group button.active {            
+
+            background-color: #add8e6;
+        }
+        .extra-job-group {
+            margin-bottom: 15px;
+        }
+        .add-button {
+            width: 40%;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px 0;
+            display: block;
+            margin: 0 auto;
+        }
+    .add-button:hover {
+          background-color: #45a049;
+    }
+        .button {
+            width: 40%;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px 0;
+            display: block;
+            margin: 0 auto;
+        }
+
+        .button:hover {
+            background-color: #45a049;
+        }
+
+        .button-red {
+            background-color: #f44336;
+            color: white;
+        }
+
+        .button-red:hover {
+            background-color: #e53935;
+        }
+        #serviceAddresses {
+            width: 100%;
+        }
+
+        #notes {
+            width: 100%;
+        }
+
+        #extraJob{
+            width: 100%;
+        }
+
+        #extraCharge{
+            width: 20%;
+            height: 30px;
+        }
+
+        .button-blue {
+            background-color: #007BFF;
+            color: white;
+        }
+
+        .button-blue:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Service Call Report</h1>
+        <div class="form-group">
+            <label for="serviceAddresses">Service Addresses</label>
+            <textarea id="serviceAddresses" name="addresses" placeholder="Enter Service Call Addresses, separated by commas"></textarea>
+        </div>
+        <button type="button" class="add-button" onclick="addAddresses()">Add Addresses</button>
+        <ul id="addressList"></ul>
+
+        <div class="form-group">
+            <label for="notes">Notes</label>
+            <input type="text" id="notes" name="notes" placeholder="Enter any pending job here">
+        </div>
+
+        <div class="button-group" id="mainJob">
+            <label for="callType">Service Call Actions</label>
+            <div class="button-row">
+                <button type="button" class="exclusive-button" data-price="20">PRESTART</button>
+                <button type="button" class="exclusive-button" data-price="30">STARTUP</button>
+                <button type="button" class="exclusive-button" data-price="20">FINISH</button>
+                <button type="button" class="exclusive-button" data-price="10">DRIVE RUN</button>
+            </div>
+        </div>
+
+        <div class="button-group" id="startupOptions">
+            <div class="button-row">
+                <button type="button" class="toggle-button">AC</button>
+                <button type="button" class="toggle-button">Heat</button>
+                <button type="button" class="toggle-button" data-price="10">2 Stg</button>
+                <button type="button" class="toggle-button" data-price="*2">2 Sys</button>
+            </div>
+        </div>
+
+        <div class="button-group" id="numbers">
+            <label for="numbers">Thermostats Installed</label>
+            <div class="button-row">
+                <button type="button" class="number-button">1</button>
+                <button type="button" class="number-button">2</button>
+                <button type="button" class="number-button">3</button>
+                <button type="button" class="number-button">4</button>
+            </div>
+        </div>
+
+        <div class="button-group" id="model">
+            <label for="model">Thermostat Model Installed</label>
+            <div class="button-row">
+                <button type="button" class="tstat-button">T10</button>
+                <button type="button" class="tstat-button">T6</button>
+                <button type="button" class="tstat-button">T8321</button>
+            </div>
+        </div>
+
+        <div class="button-group" id="model2">
+            <div class="button-row">
+                <button type="button" class="tstat-button">Ecobee</button>
+                <button type="button" class="tstat-button">T4</button>
+                <button type="button" class="tstat-button">Lennox</button>
+            </div>
+        </div>
+
+        <div class="button-group" id="misc">
+            <label for="misc">Accesories</label>
+            <div class="button-row">
+                <button type="button" class="toggle-button" data-price="30">Zoning</button>
+                <button type="button" class="toggle-button" data-price="5">Bypass</button>    
+                <button type="button" class="toggle-button" data-price="10">FIN180</button>
+                <button type="button" class="toggle-button" data-price="10">Dehum</button>
+            </div>
+        </div>
+
+        <div class="button-group" id="misc2">
+            <div class="button-row">
+                <button type="button" class="toggle-button" data-price="10">Fresh Air</button>
+                <button type="button" class="toggle-button" data-price="10">FIN-6MD</button>
+                <button type="button" class="toggle-button" data-price="5">Float Switch</button>
+            </div>
+        </div>
+
+        <div class="button-group" id="fixes">
+            <label for="fixes">Common Fixes</label>
+            <div class="button-row">
+                <button type="button" class="toggle-button" data-price="10">Pressure Test</button>
+                <button type="button" class="toggle-button" data-price="20">Leaks at Cunit</button>
+                <button type="button" class="toggle-button" data-price="20">Leaks at Ecoil</button>
+            </div>
+        </div>
+
+        <div id="extraJobsContainer"></div>
+
+        <button type="button" class="button" onclick="generateReport()">Generate Completion</button>
+
+        <div class="extra-job-group">
+            <label for="extraJob">Add Extra Job</label>
+            <input type="text" id="extraJob" placeholder="Enter Extra Job Done">
+        </div>
+        <div class="extra-job-group">
+            <label for="extraCharge">Charge</label>
+            <input type="number" id="extraCharge" placeholder="$">
+        </div>
+        <button type="button" class="add-button" onclick="addExtraJob()">Add Extra Job</button>
+
+        <div id="reportContainer"></div>
+    </div>
+
+    <script>
+        function addExtraJob() {
+            const extraJob = document.getElementById('extraJob').value.trim();
+            const extraCharge = document.getElementById('extraCharge').value.trim();
+
+            if (extraJob && extraCharge) {
+                const extraJobsContainer = document.getElementById('extraJobsContainer');
+                const listItem = document.createElement('div');
+                listItem.style.display = 'flex';
+                listItem.style.alignItems = 'center';
+                listItem.style.marginBottom = '10px';
+
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.checked = true;
+                checkbox.style.marginRight = '10px';
+
+                const text = document.createElement('span');
+                text.textContent = `${extraJob} $${extraCharge}`;
+                text.style.flexGrow = '1';
+
+                const deleteButton = document.createElement('button');
+                deleteButton.textContent = 'Delete';
+                deleteButton.classList.add('button-red');
+                deleteButton.style.marginLeft = '10px';
+                deleteButton.onclick = () => {
+                    extraJobsContainer.removeChild(listItem);
+                };
+
+                listItem.appendChild(checkbox);
+                listItem.appendChild(text);
+                listItem.appendChild(deleteButton);
+                extraJobsContainer.appendChild(listItem);
+
+                // Clean input text after generate extra job 
+                document.getElementById('extraJob').value = '';
+                document.getElementById('extraCharge').value = '';
+            } else {
+                alert('Por favor, ingresa un trabajo extra y un monto.');
+            }
+        }
+
+        function generateReport() {
+            // Enter notes for pending job to do by other parties.
+            const notes = document.getElementById('notes').value.trim();
+
+            // Enter Address or multiple addresses separated by commas.
+            const selectedAddressElement = document.querySelector('input[name="address"]:checked');
+            if (!selectedAddressElement) {
+                alert('Por favor, selecciona una dirección.');
+                return;
+            }
+            const selectedAddress = selectedAddressElement.nextElementSibling.textContent.trim();
+
+            // Hide address and maps button
+            const addressListItem = selectedAddressElement.closest('li');
+            addressListItem.style.display = 'none';
+
+            // Add Main Job to completion report
+            const selectedMainJobButton = document.querySelector('.exclusive-button.active');
+            if (!selectedMainJobButton) {
+                alert('Por favor, selecciona un main job.');
+                return;
+            }
+            const mainJob = selectedMainJobButton.textContent.trim();
+            let total = parseInt(selectedMainJobButton.getAttribute('data-price'));
+
+            // Add active Startup Options to completion report
+            const selectedStartupOptions = Array.from(document.querySelectorAll('#startupOptions .toggle-button.active')).map(button => button.textContent.trim());
+
+            // Add active Number of Thermostats Installed to completion report
+            const selectedNumberButton = document.querySelector('.number-button.active');
+            const number = selectedNumberButton ? selectedNumberButton.textContent.trim() : '';
+
+            // Add active Thermostat Model Installed to completion report
+            const selectedModelButton = document.querySelector('.tstat-button.active');
+            const model = selectedModelButton ? selectedModelButton.textContent.trim() : '';
+
+            // Add active accessories buttons to completion report
+            const selectedAccessories = Array.from(document.querySelectorAll('#misc .toggle-button.active, #misc2 .toggle-button.active')).map(button => {
+                return {
+                    text: button.textContent.trim(),
+                    price: parseInt(button.getAttribute('data-price'))
+                };
+            });
+
+            // Capturar los botones seleccionados en tests
+            const selectedTests = Array.from(document.querySelectorAll('#fixes .toggle-button.active')).map(button => {
+                return {
+                    text: button.textContent.trim(),
+                    price: parseInt(button.getAttribute('data-price'))
+                };
+            });
+
+            // Input any extra job and Charge charged
+            const extraJobs = Array.from(document.querySelectorAll('#extraJobsContainer div')).map(div => {
+                const text = div.querySelector('span').textContent;
+                const price = parseInt(text.split('$')[1]);
+                return {
+                    text: text.split('$')[0].trim(),
+                    price: price
+                };
+            });
+
+            // Add $10 to the mainJob data-price if "2 Stg" is selected
+            if (selectedStartupOptions.includes('2 Stg')) {
+                total += 10;
+            }
+
+            // Multiplicar por 2 si se selecciona "2 Sys"
+            if (selectedStartupOptions.includes('2 Sys')) {
+                total *= 2;
+            }
+
+            // Generar el reporte
+            let report = `Notas: ${notes}, Dirección: ${selectedAddress}, `;
+
+            if (selectedStartupOptions.includes('AC') && selectedStartupOptions.includes('Heat')) {
+                report += `AC and Heat started `;
+            } else if (selectedStartupOptions.includes('AC')) {
+                report += `AC started `;
+            } else if (selectedStartupOptions.includes('Heat')) {
+                report += `Heat started `;
+            }
+
+            report += `${number} ${model} tstats $${total}`;
+
+            // Agregar (2 Stage) y/o (2 Systems) si están activos
+            if (selectedStartupOptions.includes('2 Stg')) {
+                report += `(2 Stage)`;
+            }
+            if (selectedStartupOptions.includes('2 Sys')) {
+                report += `(2 Systems)`;
+            }
+
+            selectedAccessories.forEach(option => {
+                report += `, ${option.text} $${option.price}`;
+                total += option.price;
+            });
+
+            selectedTests.forEach(option => {
+                report += `, ${option.text} $${option.price}`;
+                total += option.price;
+            });
+
+            extraJobs.forEach(job => {
+                report += `, ${job.text} $${job.price}`;
+                total += job.price;
+            });
+
+            report += `, Total $${total}`;
+
+            // Crear el contenedor del reporte
+            const reportContainer = document.getElementById('reportContainer');
+            const reportElement = document.createElement('div');
+            reportElement.style.display = 'flex';
+            reportElement.style.alignItems = 'center';
+            reportElement.style.marginBottom = '20px'; // Añadir separación entre reportes
+
+            // Crear el texto del reporte
+            const reportText = document.createElement('span');
+            reportText.textContent = report;
+            reportText.style.flexGrow = '1';
+
+            // Crear el botón de compartir
+            const shareButton = document.createElement('button');
+            shareButton.textContent = 'Share';
+            shareButton.classList.add('button');
+            shareButton.style.marginLeft = '10px';
+            shareButton.onclick = () => {
+                const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(report)}`;
+                window.open(whatsappUrl, '_blank');
+            };
+
+            // Crear el botón de eliminar
+            const deleteButton = document.createElement('button');
+            deleteButton.textContent = 'Delete';
+            deleteButton.classList.add('button-red');
+            deleteButton.style.marginLeft = '10px';
+            deleteButton.onclick = () => {
+                if (confirm('¿Estás seguro de que deseas eliminar este reporte?')) {
+                    reportContainer.removeChild(reportElement);
+                    // Restaurar la dirección y el botón de mapas a la lista de direcciones
+                    addressListItem.style.display = 'flex';
+                }
+            };
+
+            // Agregar los elementos al contenedor del reporte
+            reportElement.appendChild(reportText);
+            reportElement.appendChild(shareButton);
+            reportElement.appendChild(deleteButton);
+            reportContainer.appendChild(reportElement);
+
+            // Agregar el botón "Generate Daily Completion" si hay dos o más reportes
+            if (reportContainer.childElementCount >= 2 && !document.getElementById('dailyCompletionButton')) {
+                const dailyCompletionButton = document.createElement('button');
+                dailyCompletionButton.id = 'dailyCompletionButton';
+                dailyCompletionButton.textContent = 'Generate Daily Completion';
+                dailyCompletionButton.classList.add('button');
+                dailyCompletionButton.style.marginTop = '20px';
+                dailyCompletionButton.onclick = generateDailyCompletion;
+                reportContainer.appendChild(dailyCompletionButton);
+            } else if (reportContainer.childElementCount >= 2) {
+                const dailyCompletionButton = document.getElementById('dailyCompletionButton');
+                reportContainer.appendChild(dailyCompletionButton);
+            }
+
+            // Restaurar los estados originales de todos los botones
+            resetButtons();
+        }
+
+        function generateDailyCompletion() {
+            const reportContainer = document.getElementById('reportContainer');
+            const reports = Array.from(reportContainer.children).filter(child => child.tagName === 'DIV');
+            let dailyReport = '';
+            let totalDaily = 0;
+
+            reports.forEach(reportElement => {
+                const reportText = reportElement.querySelector('span').textContent;
+                dailyReport += reportText + '\n \n-------------------------\n \n';
+                const totalMatch = reportText.match(/Total \$([0-9]+)/);
+                if (totalMatch) {
+                    totalDaily += parseInt(totalMatch[1]);
+                }
+            });
+
+            dailyReport += `\n Total Daily: $${totalDaily}`;
+
+            // Crear el contenedor del reporte diario
+            const dailyReportElement = document.createElement('div');
+            dailyReportElement.style.marginTop = '20px';
+            dailyReportElement.style.padding = '10px';
+            dailyReportElement.style.border = '1px solid #ccc';
+            dailyReportElement.style.backgroundColor = '#f9f9f9';
+
+            // Crear el texto del reporte diario
+            const dailyReportText = document.createElement('pre');
+            dailyReportText.textContent = dailyReport;
+            dailyReportText.style.whiteSpace = 'pre-wrap';
+
+            // Crear el botón "Mail it!"
+            const mailButton = document.createElement('button');
+            mailButton.textContent = 'Mail it!';
+            mailButton.classList.add('button');
+            mailButton.style.marginLeft = '10px';
+            mailButton.onclick = () => {
+                window.location.href = `mailto:?subject=Daily Completion Report&body=${encodeURIComponent(dailyReport)}`;
+            };
+
+            // Crear el botón "Copy"
+            const copyButton = document.createElement('button');
+            copyButton.textContent = 'Copy';
+            copyButton.classList.add('button');
+            copyButton.style.marginLeft = '10px';
+            copyButton.onclick = () => {
+                navigator.clipboard.writeText(dailyReport).then(() => {
+                    alert('Reporte copiado al portapapeles');
+                });
+            };
+
+            // Crear el botón "Delete"
+            const deleteButton = document.createElement('button');
+            deleteButton.textContent = 'Delete';
+            deleteButton.classList.add('button-red');
+            deleteButton.style.marginLeft = '10px';
+            deleteButton.onclick = () => {
+                if (confirm('¿Estás seguro de que deseas eliminar este reporte diario?')) {
+                    reportContainer.removeChild(dailyReportElement);
+                }
+            };
+
+            // Crear el contenedor de los botones
+            const buttonContainer = document.createElement('div');
+            buttonContainer.style.display = 'flex';
+            buttonContainer.style.justifyContent = 'space-between';
+            buttonContainer.style.marginTop = '10px';
+
+            // Agregar los botones al contenedor de botones
+            buttonContainer.appendChild(mailButton);
+            buttonContainer.appendChild(copyButton);
+            buttonContainer.appendChild(deleteButton);
+
+            // Agregar el texto del reporte diario y el contenedor de botones al reporte diario
+            dailyReportElement.appendChild(dailyReportText);
+            dailyReportElement.appendChild(buttonContainer);
+            reportContainer.appendChild(dailyReportElement);
+        }
+
+        function addAddresses() {
+            const input = document.getElementById('serviceAddresses').value.trim();
+            const addresses = input.split(',').map(address => address.trim()).filter(address => address !== '');
+            const addressList = document.getElementById('addressList');
+
+            // Limpiar la lista de direcciones antes de agregar nuevas
+            addressList.innerHTML = '';
+
+            addresses.forEach((address, index) => {
+                const listItem = document.createElement('li');
+                listItem.style.display = 'flex';
+                listItem.style.alignItems = 'center';
+                listItem.style.flexDirection = 'column';
+                listItem.innerHTML = `
+                    <div style="display: flex; align-items: center; width: 100%;">
+                        <input type="radio" name="address" id="address${index}" style="margin-right: 10px;">
+                        <label for="address${index}" style="flex-grow: 1;">${address}</label>
+                    </div>
+                    <button type="button" class="button-blue" style="margin-top: 5px;" onclick="openGoogleMaps('${address}')">Google Maps</button>
+                `;
+                addressList.appendChild(listItem);
+            });
+
+            // Limpiar el campo de texto después de agregar las direcciones
+            document.getElementById('serviceAddresses').value = '';
+        }
+
+                function openMaps(address) {
+            const encodedAddress = encodeURIComponent(address);
+            const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodedAddress}`;
+            const appleMapsUrl = `https://maps.apple.com/?q=${encodedAddress}`;
+            
+            const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+            
+            // Detectar si es un dispositivo iOS
+            if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
+                window.open(appleMapsUrl, '_blank');
+            } else {
+                window.open(googleMapsUrl, '_blank');
+            }
+        }
+        
+        
+        function resetButtons() {
+            document.querySelectorAll('.number-button').forEach(button => button.classList.remove('active'));
+            document.querySelectorAll('.tstat-button').forEach(button => button.classList.remove('active'));
+            document.querySelectorAll('.toggle-button').forEach(button => button.classList.remove('active'));
+            document.querySelectorAll('.exclusive-button').forEach(button => button.classList.remove('active'));
+        }
+
+        document.querySelectorAll('.number-button').forEach(button => {
+            button.addEventListener('click', () => {
+                document.querySelectorAll('.number-button').forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+            });
+        });
+
+        document.querySelectorAll('.tstat-button').forEach(button => {
+            button.addEventListener('click', () => {
+                document.querySelectorAll('.tstat-button').forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+            });
+        });
+
+        document.querySelectorAll('.toggle-button').forEach(button => {
+            button.addEventListener('click', () => {
+                button.classList.toggle('active');
+            });
+        });
+
+        document.querySelectorAll('.exclusive-button').forEach(button => {
+            button.addEventListener('click', () => {
+                document.querySelectorAll('.exclusive-button').forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>
